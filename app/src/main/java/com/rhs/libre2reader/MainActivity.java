@@ -1,8 +1,11 @@
 package com.rhs.libre2reader;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.rhs.libre2reader.Utils.DecryptionUtils;
 import com.rhs.libre2reader.Utils.LibreUtils;
 import com.rhs.libre2reader.Utils.NfcVReaderTask;
-import com.rhs.libre2reader.R;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvData;
@@ -45,12 +47,33 @@ public class MainActivity extends AppCompatActivity {
             });
         } else {
             tvData.setText("Tap device on Libre2 sensor");
+            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
             readNFCData();
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        Log.e("@@@@@@", "Detected NFC data");
+        new NfcVReaderTask((trend, history, serialNo, pathInfo, sensorUid, age, startDate, maxAge, succeeded, error) -> {
+            if (succeeded) {
+                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).glucoseLevelRaw));
+                tvData.append(String.format("\nSerial No : %s", serialNo));
+                tvData.append(String.format("\nPatch Info : %s", pathInfo));
+                tvData.append(String.format("\nSensor UID : %s", sensorUid));
+                tvData.append(String.format("\nAge : %s", DecryptionUtils.timeFormat(age)));
+                tvData.append(String.format("\nMax Age : %s", DecryptionUtils.timeFormat(maxAge)));
+                tvData.append(String.format("\nStart Date : %s", DecryptionUtils.sdf.format(startDate)));
+                tvData.append(String.format("\nExpiry Date : %s", DecryptionUtils.sdf.format(startDate + maxAge * 60 * 1000L)));
+            } else {
+                tvData.setText(error);
+            }
+        }).execute(tag);
+    }
+
     private void readNFCData() {
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null || !nfcAdapter.isEnabled()) {
             Toast.makeText(this, "NFC is not enabled or supported", Toast.LENGTH_SHORT).show();
             return;

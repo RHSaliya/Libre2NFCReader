@@ -117,7 +117,7 @@ public class NfcVReaderTask extends AsyncTask<Tag, Void, Tag> {
                     intData[i] = data[i] & 0xff;
                 }
                 int[] decrData = DecryptionUtils.decryptFRAM(sensorUid, patchInfo, intData);
-                extractFRAMData(decrData, (trend, history, age, startDate, maxAge) -> listener.onDataReceived(trendList, historyList, serialNoString, patchInfoString, sensorUidString, age, startDate, maxAge, true, "None"));
+                extractFRAMData(decrData, (trend, history, age, startDate, maxAge) -> listener.onDataReceived(trend, history, serialNoString, patchInfoString, sensorUidString, age, startDate, maxAge, true, "None"));
             } catch (Exception e) {
                 Log.e("ScannedDataFromNfc", "Got exception reading nfc in background: ", e);
                 listener.onDataReceived(trendList, historyList, serialNoString, patchInfoString, sensorUidString, 0, 0, 0, false, "Got exception reading nfc in background: " + e.getLocalizedMessage());
