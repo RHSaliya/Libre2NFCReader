@@ -8,4 +8,3 @@ I have exracted this code form the opensource iOS project DieBLE.
 https://github.com/gui-dos/DiaBLE
 
 I hope this code can be helpful to you.
-Happy coding!!!
