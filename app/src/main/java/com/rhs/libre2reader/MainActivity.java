@@ -18,7 +18,7 @@ import com.rhs.libre2reader.Utils.NfcVReaderTask;
 public class MainActivity extends AppCompatActivity {
     TextView tvData;
     NfcAdapter nfcAdapter;
-    boolean useDummyData = false;
+    boolean useDummyData = true;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             String serialNo = LibreUtils.decodeSerialNumberKey(sensorUid);
             int[] fram = DecryptionUtils.decryptFRAM(sensorUid, patchInfo, data);
             DecryptionUtils.extractFRAMData(fram, (trend, history, age, startDate, maxAge) -> {
-                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).glucoseLevelRaw));
+                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).rawValue));
                 tvData.append(String.format("\nSerial No : %s", serialNo));
                 tvData.append(String.format("\nPatch Info : %s", DecryptionUtils.bytesToHex(patchInfo)));
                 tvData.append(String.format("\nSensor UID : %s", DecryptionUtils.bytesToHex(sensorUid)));
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         Log.e("@@@@@@", "Detected NFC data");
         new NfcVReaderTask((trend, history, serialNo, pathInfo, sensorUid, age, startDate, maxAge, succeeded, error) -> {
             if (succeeded) {
-                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).glucoseLevelRaw));
+                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).rawValue));
                 tvData.append(String.format("\nSerial No : %s", serialNo));
                 tvData.append(String.format("\nPatch Info : %s", pathInfo));
                 tvData.append(String.format("\nSensor UID : %s", sensorUid));
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         options.putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 5000);
         nfcAdapter.enableReaderMode(this, tag -> new NfcVReaderTask((trend, history, serialNo, pathInfo, sensorUid, age, startDate, maxAge, succeeded, error) -> {
             if (succeeded) {
-                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).glucoseLevelRaw));
+                tvData.setText(String.format("Glucose Raw: %d \n", trend.get(0).rawValue));
                 tvData.append(String.format("\nSerial No : %s", serialNo));
                 tvData.append(String.format("\nPatch Info : %s", pathInfo));
                 tvData.append(String.format("\nSensor UID : %s", sensorUid));

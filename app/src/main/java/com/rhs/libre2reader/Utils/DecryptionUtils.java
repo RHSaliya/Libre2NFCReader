@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.rhs.libre2reader.Models.CalibrationInfo;
 import com.rhs.libre2reader.Models.GlucoseData;
 
 import java.text.SimpleDateFormat;
@@ -157,8 +158,20 @@ public class DecryptionUtils {
             GlucoseData glucoseData = GlucoseData.fromFram(fram, offset, startDate, age, i, false);
             history.add(glucoseData);
         }
+        final CalibrationInfo calibrationInfo = GlucoseData.getCalibrationInfo(fram);
+        calibrateGlucose(trend, calibrationInfo);
+        calibrateGlucose(history, calibrationInfo);
 
         onDataReceivedListener.onDataReceived(trend, history, age, startDate, maxAge);
+    }
+
+
+    public static void calibrateGlucose(List<GlucoseData> data, CalibrationInfo calibrationInfo){
+        for (GlucoseData glucoseData : data) {
+            GlucoseUtils.factoryGlucose(glucoseData, calibrationInfo);
+            Log.e("@@@@@@@@@@@", "Calibrated Glucose: "+ glucoseData.value);
+            Log.e("@@@@@@@@@@@", "Calibrated Temperature: "+ glucoseData.temperature);
+        }
     }
 
     public interface OnDataReceivedListener {
